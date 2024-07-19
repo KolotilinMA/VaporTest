@@ -27,6 +27,7 @@ func routes(_ app: Application) throws {
 	try app.register(collection: ProductsController())
 	try app.register(collection: UsersController())
 	try app.register(collection: TrainingEventController())
+	try app.register(collection: TelegramController())
 	app.routes.defaultMaxBodySize = "10Mb"
 	
 }

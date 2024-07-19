@@ -17,6 +17,10 @@ enum Entrypoint {
         app.logger.debug("Running with \(executorTakeoverSuccess ? "SwiftNIO" : "standard") Swift Concurrency default executor")
         
         do {
+			
+			let botActor = TGBotActor.shared
+			let appContext = TelegramApplicationContext(logger: app.logger, botActor: botActor)
+			try await configure(appContext: appContext)
             try await configure(app)
         } catch {
             app.logger.report(error: error)

@@ -12,7 +12,7 @@ struct UsersController: RouteCollection {
 	
 	func boot(routes: RoutesBuilder) throws {
 		
-		let usersGroup = routes.grouped("v1/users")
+		let usersGroup = routes.grouped("users")
 		usersGroup.post(use: createHandler)
 		usersGroup.get(use: getAllHandler)
 		
