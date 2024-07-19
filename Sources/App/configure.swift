@@ -15,21 +15,27 @@ public func configure(_ app: Application) async throws {
 	ContentConfiguration.global.use(decoder: JSONDecoder.serverDecoder, for: .json)
 	app.middleware.use(ErrorMiddleware())
 	app.databases.use(DatabaseConfigurationFactory.sqlite(.file("db.sqlite")), as: .sqlite)
-	app.migrations.add(CreateProduct())
-	app.migrations.add(CreateUser())
-	app.migrations.add(CreateTrainingEvent())
+	
 	app.http.server.configuration.hostname = "0.0.0.0"
 	app.http.server.configuration.port = 80
 	
-	await app.jwt.keys.add(hmac: JWTConfig.signerKey, digestAlgorithm: .sha256)
+	await app.jwt.keys.add(hmac: JWTConfig.signerKey, digestAlgorithm: JWTConfig.algorithm)
 	
-	try await app.autoMigrate()
+	try await addMigration(app)
+	
 	// register routes
 	try routes(app)
 }
 
+private func addMigration(_ app: Application) async throws {
+	app.migrations.add(CreateProduct())
+	app.migrations.add(CreateTrainingEvent())
+	app.migrations.add(CreateUser())
+	app.migrations.add(CreateLoginAttempts())
+	try await app.autoMigrate()
+}
 
-func configure(appContext: TelegramApplicationContext) async throws {
+func configure(_ app: Application, appContext: TelegramApplicationContext) async throws {
 	let tgApi: String = "6730904969:AAHQ226O7QjwGq83MMMQO7n2kjuPZkpfRSQ"
 	
 	/// SET WEBHOOK CONNECTION
@@ -50,7 +56,7 @@ func configure(appContext: TelegramApplicationContext) async throws {
 	// bot.log.logLevel = .error
 	
 	await appContext.botActor.setBot(bot)
-	await DefaultBotHandlers.addHandlers(bot: appContext.botActor.bot)
+	await DefaultBotHandlers.addHandlers(app, bot: appContext.botActor.bot)
 	try await appContext.botActor.bot.start()
 }
 

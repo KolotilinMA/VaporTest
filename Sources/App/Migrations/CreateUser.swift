@@ -18,6 +18,10 @@ struct CreateUser: AsyncMigration {
 			.field("password", .string, .required)
 			.field("role", .string, .required)
 			.field("profilePic", .string)
+			.field("created_at", .datetime, .required)
+			.field("registrationCode", .int)
+			.field("telegramID", .int)
+			.field("finishedRegistration", .bool, .required)
 			.unique(on: "login")
 			.create()
 	}
